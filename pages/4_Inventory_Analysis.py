@@ -16,7 +16,7 @@ FROM products;
 """)
 
 total_stock = run_query("""
-SELECT SUM(stock) AS total_stock
+SELECT COALESCE(SUM(stock), 0) AS total_stock
 FROM products;
 """)
 
@@ -32,30 +32,35 @@ FROM products
 WHERE stock = 0;
 """)
 
+tot_prod_val = int(total_products.iloc[0]["total_products"]) if not total_products.empty else 0
+tot_stock_val = int(total_stock.iloc[0]["total_stock"]) if not total_stock.empty else 0
+low_stock_val = int(low_stock.iloc[0]["low_stock"]) if not low_stock.empty else 0
+out_stock_val = int(out_stock.iloc[0]["out_stock"]) if not out_stock.empty else 0
+
 col1, col2, col3, col4 = st.columns(4)
 
 with col1:
     st.metric(
         "📦 Products",
-        int(total_products.iloc[0]["total_products"])
+        tot_prod_val
     )
 
 with col2:
     st.metric(
         "📊 Total Stock",
-        int(total_stock.iloc[0]["total_stock"])
+        tot_stock_val
     )
 
 with col3:
     st.metric(
         "⚠ Low Stock",
-        int(low_stock.iloc[0]["low_stock"])
+        low_stock_val
     )
 
 with col4:
     st.metric(
         "❌ Out of Stock",
-        int(out_stock.iloc[0]["out_stock"])
+        out_stock_val
     )
 
 st.divider()
@@ -66,16 +71,16 @@ st.divider()
 
 status = run_query("""
 SELECT
-status,
-COUNT(*) AS Total
+    status,
+    COUNT(*) AS "Total"
 FROM
 (
     SELECT
-    CASE
-        WHEN stock = 0 THEN 'Out of Stock'
-        WHEN stock <= 10 THEN 'Low Stock'
-        ELSE 'In Stock'
-    END AS status
+        CASE
+            WHEN stock = 0 THEN 'Out of Stock'
+            WHEN stock <= 10 THEN 'Low Stock'
+            ELSE 'In Stock'
+        END AS status
     FROM products
 ) AS inventory_status
 GROUP BY status;
@@ -95,11 +100,11 @@ fig1 = px.pie(
 
 category = run_query("""
 SELECT
-category,
-SUM(stock) AS Stock
+    category,
+    COALESCE(SUM(stock), 0) AS "Stock"
 FROM products
 GROUP BY category
-ORDER BY Stock DESC;
+ORDER BY "Stock" DESC;
 """)
 
 fig2 = px.bar(

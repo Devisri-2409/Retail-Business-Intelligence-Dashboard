@@ -15,35 +15,35 @@ if level == "Year":
 
     query = """
     SELECT
-    YEAR(sale_date) AS Period,
-    SUM(total_amount) AS Revenue
+        EXTRACT(YEAR FROM sale_date)::INTEGER AS "Period",
+        COALESCE(SUM(total_amount), 0) AS "Revenue"
     FROM sales
-    GROUP BY YEAR(sale_date)
-    ORDER BY YEAR(sale_date)
+    GROUP BY EXTRACT(YEAR FROM sale_date)
+    ORDER BY "Period";
     """
 
 elif level == "Quarter":
 
     query = """
     SELECT
-QUARTER(sale_date) AS QuarterNo,
-CONCAT('Q', QUARTER(sale_date)) AS Period,
-SUM(total_amount) AS Revenue
-FROM sales
-GROUP BY QuarterNo
-ORDER BY QuarterNo;
+        EXTRACT(QUARTER FROM sale_date)::INTEGER AS "QuarterNo",
+        CONCAT('Q', EXTRACT(QUARTER FROM sale_date)::INTEGER) AS "Period",
+        COALESCE(SUM(total_amount), 0) AS "Revenue"
+    FROM sales
+    GROUP BY EXTRACT(QUARTER FROM sale_date)
+    ORDER BY "QuarterNo";
     """
 
 else:
 
     query = """
     SELECT
-    MONTHNAME(sale_date) AS Period,
-    MONTH(sale_date) AS MonthNo,
-    SUM(total_amount) AS Revenue
+        TRIM(TO_CHAR(sale_date, 'Month')) AS "Period",
+        EXTRACT(MONTH FROM sale_date)::INTEGER AS "MonthNo",
+        COALESCE(SUM(total_amount), 0) AS "Revenue"
     FROM sales
-    GROUP BY MONTH(sale_date),MONTHNAME(sale_date)
-    ORDER BY MonthNo
+    GROUP BY EXTRACT(MONTH FROM sale_date), TRIM(TO_CHAR(sale_date, 'Month'))
+    ORDER BY "MonthNo";
     """
 
 data = run_query(query)

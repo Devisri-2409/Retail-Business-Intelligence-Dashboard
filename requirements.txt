@@ -4,3 +4,5 @@ plotly
 sqlalchemy
 pymysql
 streamlit-autorefresh
+psycopg[binary]
+python-dotenv

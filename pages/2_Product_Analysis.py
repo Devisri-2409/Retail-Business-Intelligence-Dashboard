@@ -32,55 +32,58 @@ if selected_category == "All":
     revenue_query = """
     SELECT
         p.category,
-        SUM(s.total_amount) AS Revenue
+        COALESCE(SUM(s.total_amount), 0) AS "Revenue"
     FROM sales s
     JOIN products p
         ON s.product_id = p.product_id
     GROUP BY p.category
-    ORDER BY Revenue DESC;
+    ORDER BY "Revenue" DESC;
     """
+    revenue_params = None
 
     product_query = """
     SELECT
         p.product_name,
-        SUM(s.quantity) AS UnitsSold
+        COALESCE(SUM(s.quantity), 0) AS "UnitsSold"
     FROM sales s
     JOIN products p
         ON s.product_id = p.product_id
     GROUP BY p.product_name
-    ORDER BY UnitsSold DESC
+    ORDER BY "UnitsSold" DESC
     LIMIT 10;
     """
+    product_params = None
 
 else:
 
-    revenue_query = f"""
+    revenue_query = """
     SELECT
         p.category,
-        SUM(s.total_amount) AS Revenue
+        COALESCE(SUM(s.total_amount), 0) AS "Revenue"
     FROM sales s
     JOIN products p
         ON s.product_id = p.product_id
-    WHERE p.category='{selected_category}'
+    WHERE p.category = :category
     GROUP BY p.category;
     """
+    revenue_params = {"category": selected_category}
 
-    product_query = f"""
+    product_query = """
     SELECT
         p.product_name,
-        SUM(s.quantity) AS UnitsSold
+        COALESCE(SUM(s.quantity), 0) AS "UnitsSold"
     FROM sales s
     JOIN products p
         ON s.product_id = p.product_id
-    WHERE p.category='{selected_category}'
+    WHERE p.category = :category
     GROUP BY p.product_name
-    ORDER BY UnitsSold DESC
+    ORDER BY "UnitsSold" DESC
     LIMIT 10;
     """
+    product_params = {"category": selected_category}
 
-category_sales = run_query(revenue_query)
-
-top_products = run_query(product_query)
+category_sales = run_query(revenue_query, params=revenue_params)
+top_products = run_query(product_query, params=product_params)
 
 # ---------------------------------------------------
 # Charts
@@ -121,21 +124,37 @@ with col2:
 
 st.subheader("📋 Product Performance")
 
-table_query = f"""
-SELECT
-    p.product_name,
-    p.category,
-    SUM(s.quantity) AS UnitsSold,
-    SUM(s.total_amount) AS Revenue
-FROM sales s
-JOIN products p
-ON s.product_id = p.product_id
-{"WHERE p.category='" + selected_category + "'" if selected_category != "All" else ""}
-GROUP BY p.product_name,p.category
-ORDER BY Revenue DESC;
-"""
+if selected_category == "All":
+    table_query = """
+    SELECT
+        p.product_name,
+        p.category,
+        COALESCE(SUM(s.quantity), 0) AS "UnitsSold",
+        COALESCE(SUM(s.total_amount), 0) AS "Revenue"
+    FROM sales s
+    JOIN products p
+    ON s.product_id = p.product_id
+    GROUP BY p.product_name, p.category
+    ORDER BY "Revenue" DESC;
+    """
+    table_params = None
+else:
+    table_query = """
+    SELECT
+        p.product_name,
+        p.category,
+        COALESCE(SUM(s.quantity), 0) AS "UnitsSold",
+        COALESCE(SUM(s.total_amount), 0) AS "Revenue"
+    FROM sales s
+    JOIN products p
+    ON s.product_id = p.product_id
+    WHERE p.category = :category
+    GROUP BY p.product_name, p.category
+    ORDER BY "Revenue" DESC;
+    """
+    table_params = {"category": selected_category}
 
-table = run_query(table_query)
+table = run_query(table_query, params=table_params)
 
 st.dataframe(
     table,

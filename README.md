@@ -1,6 +1,6 @@
 # 🛒 Retail Business Intelligence Dashboard
 
-An interactive **Retail Business Intelligence Dashboard** built using **Python, Streamlit, MySQL (Aiven), Plotly, Pandas, and SQLAlchemy**. It provides real-time insights into sales, products, customers, inventory, and business performance through interactive visualizations and OLAP analysis.
+An interactive **Retail Business Intelligence Dashboard** built using **Python, Streamlit, PostgreSQL, Plotly, Pandas, and SQLAlchemy**. It provides real-time insights into sales, products, customers, inventory, and business performance through interactive visualizations and OLAP analysis.
 
 ## ✨ Features
 
@@ -14,9 +14,10 @@ An interactive **Retail Business Intelligence Dashboard** built using **Python, 
 
 ## 🛠️ Tech Stack
 
-- Python
+- Python 3.13
 - Streamlit
-- MySQL (Aiven)
+- PostgreSQL
+- psycopg (v3)
 - Plotly
 - Pandas
 - SQLAlchemy
@@ -26,39 +27,58 @@ An interactive **Retail Business Intelligence Dashboard** built using **Python, 
 ```text
 Retail-Business-Intelligence-Dashboard/
 │── app.py
-│── config.py
-│── queries.py
+│── config.py (legacy MySQL configuration preserved)
 │── requirements.txt
 │── README.md
+│── .env.example
 │
 ├── assets/
+│   └── logo.png
+├── database/
+│   ├── schema.sql
+│   ├── seed_data.sql
+│   ├── apply_schema.py
+│   ├── apply_seed.py
+│   └── verify_data_quality.py
 ├── pages/
+│   ├── 1_Time_Analysis.py
+│   ├── 2_Product_Analysis.py
+│   ├── 3_Customer_Analysis.py
+│   ├── 4_Inventory_Analysis.py
+│   └── 5_OLAP_Analysis.py
+├── tests/
+│   ├── test_all_queries.py
+│   └── test_streamlit_pages.py
 └── utils/
+    ├── db.py
+    └── queries.py
 ```
 
 ## 🚀 Installation & Run
 
-### Clone the repository
-
-```bash
-git clone https://github.com/your-username/Retail-Business-Intelligence-Dashboard.git
-```
-
-### Navigate to the project
-
-```bash
-cd Retail-Business-Intelligence-Dashboard
-```
-
-### Install dependencies
+### 1. Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### Run the dashboard
+### 2. Configure Environment
+
+Copy `.env.example` to `.env` and configure your local PostgreSQL database URL:
+
+```env
+DATABASE_URL=postgresql+psycopg://postgres:<PASSWORD>@localhost:5432/retail_dashboard
+```
+
+### 3. Initialize Database & Demo Dataset (Optional)
+
+```bash
+python database/apply_schema.py
+python database/apply_seed.py
+```
+
+### 4. Run the dashboard
 
 ```bash
 streamlit run app.py
 ```
-
