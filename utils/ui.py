@@ -29,6 +29,7 @@ THEME_CONFIGS = {
         "delta_down_text": "#b91c1c",
         "delta_neutral_bg": "#f1f5f9",
         "delta_neutral_text": "#475569",
+        "insight_bg": "#f8fafc",
         "palette": ["#1e40af", "#0284c7", "#0d9488", "#d97706", "#7c3aed", "#db2777"]
     },
     "Dark": {
@@ -46,12 +47,13 @@ THEME_CONFIGS = {
         "chart_bg": "#1e293b",
         "chart_paper": "#1e293b",
         "grid_color": "#334155",
-        "delta_up_bg": "rgba(16, 185, 129, 0.18)",
+        "delta_up_bg": "rgba(16, 185, 129, 0.16)",
         "delta_up_text": "#34d399",
-        "delta_down_bg": "rgba(239, 68, 68, 0.18)",
+        "delta_down_bg": "rgba(239, 68, 68, 0.16)",
         "delta_down_text": "#f87171",
-        "delta_neutral_bg": "rgba(148, 163, 184, 0.15)",
+        "delta_neutral_bg": "rgba(148, 163, 184, 0.12)",
         "delta_neutral_text": "#94a3b8",
+        "insight_bg": "#1e293b",
         "palette": ["#38bdf8", "#2dd4bf", "#fbbf24", "#a78bfa", "#f472b6", "#34d399"]
     }
 }
@@ -83,73 +85,111 @@ def apply_custom_css(theme: str = "Light"):
 
     css = f"""
     <style>
-        /* Main Container Styling */
+        /* Main Container Spacing */
         .block-container {{
-            padding-top: 1.5rem !important;
-            padding-bottom: 2.5rem !important;
-            max-width: 1300px;
+            padding-top: 1.25rem !important;
+            padding-bottom: 2rem !important;
+            max-width: 1320px;
         }}
 
-        /* Executive Header */
-        .exec-header {{
+        /* Clean Header */
+        .exec-header-container {{
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding-bottom: 0.75rem;
-            margin-bottom: 1rem;
+            padding-bottom: 0.85rem;
+            margin-bottom: 0.75rem;
             border-bottom: 1px solid {cfg['card_border']};
+            gap: 16px;
+        }}
+        .exec-header-left {{
+            display: flex;
+            align-items: center;
+            gap: 14px;
         }}
         .exec-title {{
-            font-size: 1.75rem;
+            font-size: 1.55rem;
             font-weight: 700;
             color: {cfg['text_primary']};
-            letter-spacing: -0.025em;
+            letter-spacing: -0.02em;
             margin: 0;
             line-height: 1.2;
         }}
         .exec-subtitle {{
-            font-size: 0.95rem;
+            font-size: 0.88rem;
             color: {cfg['text_secondary']};
-            margin-top: 0.25rem;
+            margin-top: 2px;
             margin-bottom: 0;
         }}
         .exec-badge {{
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            padding: 4px 10px;
+            padding: 5px 12px;
             border-radius: 9999px;
-            font-size: 0.78rem;
+            font-size: 0.76rem;
             font-weight: 500;
             background-color: {cfg['delta_neutral_bg']};
             color: {cfg['text_secondary']};
             border: 1px solid {cfg['card_border']};
+            white-space: nowrap;
         }}
-        .status-dot {{
+        .status-dot-online {{
             width: 7px;
             height: 7px;
             border-radius: 50%;
             background-color: #10b981;
+            box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
+        }}
+        .status-dot-offline {{
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background-color: #ef4444;
+            box-shadow: 0 0 6px rgba(239, 68, 68, 0.6);
         }}
 
-        /* Filter Container */
-        .filter-panel {{
-            background: {cfg['card_bg']};
-            border: 1px solid {cfg['card_border']};
-            border-radius: 10px;
-            padding: 14px 18px 8px 18px;
-            margin-bottom: 1.25rem;
-            box-shadow: {cfg['card_shadow']};
+        /* Style Streamlit Native Bordered Containers uniformly */
+        div[data-testid="stVerticalBlockBorderWrapper"] {{
+            background-color: {cfg['card_bg']} !important;
+            border: 1px solid {cfg['card_border']} !important;
+            border-radius: 10px !important;
+            box-shadow: {cfg['card_shadow']} !important;
+            padding: 14px 16px !important;
+            margin-bottom: 0.75rem !important;
         }}
 
-        /* Metric Cards */
+        /* Subtle Executive Insight Cards (Nested Bordered Containers) */
+        div[data-testid="stVerticalBlockBorderWrapper"] div[data-testid="stVerticalBlockBorderWrapper"] {{
+            background-color: {cfg['insight_bg']} !important;
+            border-left: 3px solid {cfg['accent_primary']} !important;
+            border-top: 1px solid {cfg['card_border']} !important;
+            border-right: 1px solid {cfg['card_border']} !important;
+            border-bottom: 1px solid {cfg['card_border']} !important;
+            border-radius: 8px !important;
+            padding: 10px 14px !important;
+            margin-bottom: 0.5rem !important;
+            box-shadow: none !important;
+        }}
+        div[data-testid="stVerticalBlockBorderWrapper"] div[data-testid="stVerticalBlockBorderWrapper"] p {{
+            font-size: 0.86rem !important;
+            color: {cfg['text_primary']} !important;
+            line-height: 1.45 !important;
+            margin: 0 !important;
+        }}
+        div[data-testid="stVerticalBlockBorderWrapper"] div[data-testid="stVerticalBlockBorderWrapper"] strong {{
+            color: {cfg['text_primary']} !important;
+            font-weight: 600 !important;
+        }}
+
+        /* Consistent KPI Metric Cards */
         .kpi-card {{
             background: {cfg['card_bg']};
             border: 1px solid {cfg['card_border']};
             border-radius: 10px;
-            padding: 16px 18px;
+            padding: 14px 16px;
             box-shadow: {cfg['card_shadow']};
-            height: 100%;
+            min-height: 114px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -157,32 +197,32 @@ def apply_custom_css(theme: str = "Light"):
         }}
         .kpi-card:hover {{
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.07);
         }}
         .kpi-label {{
-            font-size: 0.82rem;
+            font-size: 0.78rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             color: {cfg['text_secondary']};
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }}
         .kpi-value {{
-            font-size: 1.85rem;
+            font-size: 1.75rem;
             font-weight: 700;
             color: {cfg['text_primary']};
             line-height: 1.15;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             letter-spacing: -0.02em;
         }}
         .kpi-delta {{
             display: inline-flex;
             align-items: center;
             gap: 4px;
-            font-size: 0.78rem;
-            font-weight: 600;
+            font-size: 0.74rem;
+            font-weight: 500;
             padding: 2px 7px;
-            border-radius: 6px;
+            border-radius: 5px;
             width: fit-content;
         }}
         .delta-up {{
@@ -198,46 +238,56 @@ def apply_custom_css(theme: str = "Light"):
             color: {cfg['delta_neutral_text']};
         }}
 
-        /* Card Section Containers */
-        .section-card {{
-            background: {cfg['card_bg']};
-            border: 1px solid {cfg['card_border']};
-            border-radius: 10px;
-            padding: 18px;
-            margin-bottom: 1.25rem;
-            box-shadow: {cfg['card_shadow']};
-        }}
+        /* Standardized Section Headers */
         .section-header {{
-            font-size: 1.05rem;
+            font-size: 0.98rem;
             font-weight: 600;
             color: {cfg['text_primary']};
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
             gap: 8px;
         }}
 
-        /* Stock Pill Indicators */
+        /* Subtle Business Insight Cards */
+        .insight-card {{
+            background: {cfg['insight_bg']};
+            border-left: 3px solid {cfg['accent_primary']};
+            border-radius: 6px;
+            padding: 9px 12px;
+            margin-bottom: 8px;
+            font-size: 0.84rem;
+            color: {cfg['text_primary']};
+            line-height: 1.4;
+        }}
+
+        /* Stock Status Badges */
         .stock-pill {{
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            padding: 3px 8px;
+            justify-content: center;
+            gap: 5px;
+            padding: 4px 10px;
             border-radius: 6px;
             font-size: 0.78rem;
             font-weight: 600;
+            width: 100%;
+            text-align: center;
         }}
         .stock-out {{
             background-color: {cfg['delta_down_bg']};
             color: {cfg['delta_down_text']};
+            border: 1px solid rgba(239, 68, 68, 0.3);
         }}
         .stock-low {{
-            background-color: {cfg['delta_up_bg'] if theme=='Dark' else '#fffbeb'};
-            color: {cfg['delta_up_text'] if theme=='Dark' else '#b45309'};
+            background-color: {'rgba(245, 158, 11, 0.16)' if theme=='Dark' else '#fffbeb'};
+            color: {'#fbbf24' if theme=='Dark' else '#b45309'};
+            border: 1px solid {'rgba(245, 158, 11, 0.3)' if theme=='Dark' else '#fde68a'};
         }}
         .stock-ok {{
             background-color: {cfg['delta_up_bg']};
             color: {cfg['delta_up_text']};
+            border: 1px solid rgba(16, 185, 129, 0.3);
         }}
 
         /* Sidebar Footer */
@@ -245,7 +295,7 @@ def apply_custom_css(theme: str = "Light"):
             padding: 1rem 0;
             margin-top: 2rem;
             border-top: 1px solid {cfg['card_border']};
-            font-size: 0.75rem;
+            font-size: 0.74rem;
             color: {cfg['text_muted']};
             line-height: 1.4;
         }}
@@ -274,7 +324,7 @@ def render_kpi_card(label: str, value: str, delta: str = None, delta_type: str =
     """
     st.markdown(html, unsafe_allow_html=True)
 
-def style_plotly_chart(fig: go.Figure, theme: str = "Light", height: int = 340) -> go.Figure:
+def style_plotly_chart(fig: go.Figure, theme: str = "Light", height: int = 310) -> go.Figure:
     """Apply consistent Power BI / Tableau grade visual styling to a Plotly figure."""
     cfg = THEME_CONFIGS.get(theme, THEME_CONFIGS["Light"])
 
@@ -285,13 +335,13 @@ def style_plotly_chart(fig: go.Figure, theme: str = "Light", height: int = 340) 
         font=dict(
             family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
             color=cfg["text_primary"],
-            size=12
+            size=11
         ),
-        margin=dict(l=40, r=20, t=45, b=40),
+        margin=dict(l=35, r=15, t=35, b=35),
         height=height,
         hoverlabel=dict(
             bgcolor=cfg["card_bg"],
-            font_size=12,
+            font_size=11,
             font_family="Inter, sans-serif",
             bordercolor=cfg["card_border"]
         ),
@@ -300,16 +350,16 @@ def style_plotly_chart(fig: go.Figure, theme: str = "Light", height: int = 340) 
             gridcolor=cfg["grid_color"],
             linecolor=cfg["card_border"],
             tickcolor=cfg["card_border"],
-            title_font=dict(size=12, color=cfg["text_secondary"]),
-            tickfont=dict(size=11, color=cfg["text_secondary"])
+            title_font=dict(size=11, color=cfg["text_secondary"]),
+            tickfont=dict(size=10, color=cfg["text_secondary"])
         ),
         yaxis=dict(
             showgrid=True,
             gridcolor=cfg["grid_color"],
             linecolor=cfg["card_border"],
             tickcolor=cfg["card_border"],
-            title_font=dict(size=12, color=cfg["text_secondary"]),
-            tickfont=dict(size=11, color=cfg["text_secondary"])
+            title_font=dict(size=11, color=cfg["text_secondary"]),
+            tickfont=dict(size=10, color=cfg["text_secondary"])
         )
     )
     return fig
